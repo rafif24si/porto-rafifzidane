@@ -23,7 +23,7 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20)
 
-      const sections = ['home', 'about', 'portfolio', 'contact']
+      const sections = ['home', 'about', 'portfolio', 'experience', 'gallery', 'contact']
 
       for (const sectionId of sections) {
         const section = document.getElementById(sectionId)
@@ -69,6 +69,7 @@ export default function Navbar() {
 
   if (!mounted) return null
 
+  // ✅ FUNGSI SCROLL YANG SUDAH DIPERBAIKI (ANTI-LAG)
   const smoothScrollTo = (
     e: React.MouseEvent<HTMLAnchorElement>,
     targetId: string
@@ -78,40 +79,15 @@ export default function Navbar() {
     const target = document.querySelector(targetId)
     if (!target) return
 
-    const navbarOffset = 3
-    const targetPosition =
-      target.getBoundingClientRect().top + window.scrollY - navbarOffset
+    const navbarOffset = 80 // Jarak offset dari atas layar
+    const elementPosition = target.getBoundingClientRect().top
+    const offsetPosition = elementPosition + window.scrollY - navbarOffset
 
-    const startPosition = window.scrollY
-    const distance = targetPosition - startPosition
-    const duration = 1200
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    })
 
-    let startTime: number | null = null
-
-    const easeInOutCubic = (t: number) => {
-      return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2
-    }
-
-    const animation = (currentTime: number) => {
-      if (startTime === null) startTime = currentTime
-
-      const timeElapsed = currentTime - startTime
-      const progress = Math.min(timeElapsed / duration, 1)
-
-      const ease = easeInOutCubic(progress)
-
-      window.scrollTo({
-        top: startPosition + distance * ease,
-      })
-
-      if (timeElapsed < duration) {
-        requestAnimationFrame(animation)
-      }
-    }
-
-    requestAnimationFrame(animation)
     setOpen(false)
   }
 
@@ -119,6 +95,8 @@ export default function Navbar() {
     { label: 'Home', id: 'home' },
     { label: 'About', id: 'about' },
     { label: 'Portfolio', id: 'portfolio' },
+    { label: 'Experience', id: 'experience' },
+    { label: 'Gallery', id: 'gallery' },
     { label: 'Contact', id: 'contact' },
   ]
 
@@ -164,7 +142,7 @@ export default function Navbar() {
             letterSpacing: '0.1em',
           }}
         >
-          rifqi.dev
+          RafifZidane.
         </span>
 
         {!isMobile && (

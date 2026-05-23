@@ -172,9 +172,8 @@ export default function About() {
                   color: "var(--text-primary)",
                 }}
               >
-                <div>Rifqi</div>
-                <div>Muhammad</div>
-                <div>Aliya</div>
+                <div>M Rafif</div>
+                <div>Zidane</div>
               </div>
             </motion.div>
 
@@ -198,10 +197,7 @@ export default function About() {
                 maxWidth: isMobile ? "100%" : "490px",
               }}
             >
-              Fresh Graduate SMK Rekayasa Perangkat Lunak lulusan 2026 dengan
-              passion di bidang frontend development dan UI modern. Berfokus
-              pada pembuatan website clean, responsif, dan visual yang kuat
-              untuk menghadirkan pengalaman digital yang optimal.
+              Mahasiswa Sistem Informasi di Politeknik Caltex Riau (PCR) dengan ketertarikan mendalam di bidang Frontend Development dan UI/UX Design. Berfokus pada pengembangan website yang fungsional dan responsif menggunakan teknologi modern seperti React.js dan Laravel, serta merancang antarmuka digital yang estetis, clean, dan user-friendly.
             </motion.p>
 
             {/* QUOTE */}
@@ -223,14 +219,13 @@ export default function About() {
                 borderRadius: 10,
                 border: "1px solid var(--border)",
                 background: "var(--bg-card)",
-                fontSize: 12,
+                fontSize: 13,
                 fontStyle: "italic",
                 display: "inline-block",
                 width: "fit-content",
               }}
             >
-              “Turning ideas into clean, modern, and meaningful digital
-              experiences.”
+              "Man jadda wajada."
             </motion.div>
 
             {/* BUTTONS */}
@@ -245,7 +240,8 @@ export default function About() {
             >
               {/* DOWNLOAD CV */}
               <a
-                href="https://drive.google.com/file/d/1cFqZ0TY0U0I51K0Tchv8E4sbOv5yAZ9x/view?usp=drive_link"
+                href="/cv-rafif-zidane.pdf"
+                download="CV_M_Rafif_Zidane.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ textDecoration: "none" }}
@@ -335,8 +331,8 @@ export default function About() {
                 }}
               >
                 <img
-                  src="/assets/image.png"
-                  alt="Profile"
+                  src="/foto-rafif.png"
+                  alt="Profile Rafif"
                   style={{
                     width: 240,
                     height: 240,

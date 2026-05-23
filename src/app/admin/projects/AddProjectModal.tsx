@@ -85,7 +85,12 @@ export default function AddProjectModal({
             .from("projects")
             .upload(fileName, image);
 
-        if (uploadError) continue;
+        // Jika upload gagal, tetap lanjut ke proses berikutnya 
+        // (Bisa jadi karena kebijakan RLS, tapi kita cegah error berhenti di sini)
+        if (uploadError) {
+          console.error("Upload Error:", uploadError);
+          continue; 
+        }
 
         const { data } = supabase.storage
           .from("projects")
@@ -93,6 +98,19 @@ export default function AddProjectModal({
 
         uploadedUrls.push(data.publicUrl);
       }
+
+      // 🔥 MESIN PEMISAH TEKS MENJADI ARRAY 🔥
+      // Memecah teks tech berdasarkan koma (,)
+      const techArray = tech
+        .split(",")
+        .map((item) => item.trim())
+        .filter((item) => item !== "");
+
+      // Memecah teks features berdasarkan titik (.) atau baris baru
+      const featuresArray = features
+        .split(/(?:\.|\n)+/)
+        .map((item) => item.trim())
+        .filter((item) => item !== "");
 
       const { data, error } = await supabase
         .from("projects")
@@ -102,8 +120,8 @@ export default function AddProjectModal({
             description: desc,
             live_url: live || null,
             github_url: github || null,
-            technologies: tech,
-            key_features: features,
+            technologies: techArray,     // Format Array yang benar
+            key_features: featuresArray, // Format Array yang benar
             image_url: uploadedUrls[0] || null,
             image_urls: uploadedUrls,
           },
@@ -112,7 +130,8 @@ export default function AddProjectModal({
         .single();
 
       if (error) {
-        showToast("Gagal simpan");
+        console.error("Database Insert Error:", error);
+        showToast("Gagal simpan: Cek Console");
         setLoading(false);
         return;
       }
@@ -129,7 +148,8 @@ export default function AddProjectModal({
       setPreviews([]);
 
       onClose();
-    } catch {
+    } catch (err) {
+      console.error(err);
       showToast("Terjadi error");
     }
 
@@ -276,7 +296,7 @@ export default function AddProjectModal({
 
           {/* TECH */}
           <input
-            placeholder="Technologies"
+            placeholder="Technologies (Pisahkan dengan koma: React, Laravel, dll)"
             value={tech}
             onChange={(e) =>
               setTech(e.target.value)
@@ -286,7 +306,7 @@ export default function AddProjectModal({
 
           {/* FEATURES */}
           <input
-            placeholder="Key Features"
+            placeholder="Key Features (Pisahkan dengan titik: Fitur A. Fitur B.)"
             value={features}
             onChange={(e) =>
               setFeatures(e.target.value)

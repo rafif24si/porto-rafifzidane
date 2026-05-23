@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 import AnimatedBackground from '@/components/AnimatedBackground'
+import Experience from "@/components/sections/Experience";
+import Gallery from "@/components/sections/Gallery";
 import Navbar from '@/components/ui/Navbar'
 import Hero from '@/components/sections/Hero'
 import About from '@/components/sections/About'
@@ -77,6 +79,8 @@ useEffect(() => {
         <Hero showApp={showApp} />
         <About />
         <PortfolioShowcase />
+        <Experience />
+      <Gallery />
         <ContactSection />
       </div>
 

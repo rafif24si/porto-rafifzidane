@@ -44,76 +44,112 @@ export default function ProjectDetailPage() {
   };
 
   const handleDelete = async () => {
-  const result = await Swal.fire({
-    title: "Hapus project?",
-    text: "Project yang dihapus tidak bisa dikembalikan.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Ya, Hapus",
-    cancelButtonText: "Batal",
-    background: "#101010",
-    color: "#fff",
-    confirmButtonColor: "#ef4444",
-    cancelButtonColor: "#27272a",
-    reverseButtons: true,
-  });
-
-  if (!result.isConfirmed) return;
-
-  const { error } = await supabase.from("projects").delete().eq("id", id);
-
-  if (!error) {
-    await Swal.fire({
-      title: "Berhasil!",
-      text: "Project berhasil dihapus.",
-      icon: "success",
-      timer: 1800,
-      showConfirmButton: false,
+    const result = await Swal.fire({
+      title: "Hapus project?",
+      text: "Project yang dihapus tidak bisa dikembalikan.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Hapus",
+      cancelButtonText: "Batal",
       background: "#101010",
       color: "#fff",
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#27272a",
+      reverseButtons: true,
     });
 
-    router.push("/admin/projects");
-  } else {
-    Swal.fire({
-      title: "Gagal",
-      text: "Project gagal dihapus.",
-      icon: "error",
-      background: "#101010",
-      color: "#fff",
-    });
-  }
-};
+    if (!result.isConfirmed) return;
+
+    const { error } = await supabase.from("projects").delete().eq("id", id);
+
+    if (!error) {
+      await Swal.fire({
+        title: "Berhasil!",
+        text: "Project berhasil dihapus.",
+        icon: "success",
+        timer: 1800,
+        showConfirmButton: false,
+        background: "#101010",
+        color: "#fff",
+      });
+
+      // Mengarahkan kembali ke halaman projects
+      router.push("/admin/projects");
+      
+      // 🔥 KODE SAKTI UNTUK MENGHAPUS CACHE BAYANGAN 🔥
+      router.refresh(); 
+      
+    } else {
+      Swal.fire({
+        title: "Gagal",
+        text: "Project gagal dihapus.",
+        icon: "error",
+        background: "#101010",
+        color: "#fff",
+      });
+    }
+  };
 
   const handleUpdate = async () => {
-  const { error } = await supabase
-    .from("projects")
-    .update(form)
-    .eq("id", id);
+    // Memastikan format yang disimpan saat diedit kembali menjadi Array
+    const techArray = Array.isArray(form.technologies)
+      ? form.technologies
+      : typeof form.technologies === "string"
+      ? form.technologies
+          .split(",")
+          .map((t: string) => t.trim())
+          .filter((t: string) => t !== "")
+      : [];
 
-  if (!error) {
-    setProject(form);
-    setEditMode(false);
+    const featuresArray = Array.isArray(form.key_features)
+      ? form.key_features
+      : typeof form.key_features === "string"
+      ? form.key_features
+          .split(/(?:\.|\n)+/)
+          .map((f: string) => f.trim())
+          .filter((f: string) => f !== "")
+      : [];
 
-    Swal.fire({
-      title: "Berhasil",
-      text: "Project berhasil diperbarui.",
-      icon: "success",
-      timer: 1800,
-      showConfirmButton: false,
-      background: "#101010",
-      color: "#fff",
-    });
-  } else {
-    Swal.fire({
-      title: "Gagal",
-      text: "Update project gagal.",
-      icon: "error",
-      background: "#101010",
-      color: "#fff",
-    });
-  }
-};
+    const updatedForm = {
+      ...form,
+      technologies: techArray,
+      key_features: featuresArray,
+    };
+
+    const { error } = await supabase
+      .from("projects")
+      .update(updatedForm)
+      .eq("id", id);
+
+    if (!error) {
+      setProject(updatedForm);
+      setForm(updatedForm);
+      setEditMode(false);
+
+      Swal.fire({
+        title: "Berhasil",
+        text: "Project berhasil diperbarui.",
+        icon: "success",
+        timer: 1800,
+        showConfirmButton: false,
+        background: "#101010",
+        color: "#fff",
+      });
+      
+      // Memaksa data baru termuat setelah diedit
+      router.refresh();
+
+    } else {
+      Swal.fire({
+        title: "Gagal",
+        text: "Update project gagal.",
+        icon: "error",
+        background: "#101010",
+        color: "#fff",
+      });
+    }
+  };
+
   if (!project)
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white">
@@ -121,20 +157,25 @@ export default function ProjectDetailPage() {
       </div>
     );
 
-  const tech = (form.technologies || "")
-    .split(",")
-    .filter((t: string) => t.trim() !== "");
+  // Menangani format Array dengan aman agar tidak terjadi error split()
+  const tech = Array.isArray(form.technologies)
+    ? form.technologies
+    : typeof form.technologies === "string"
+    ? form.technologies.split(",").filter((t: string) => t.trim() !== "")
+    : [];
 
-  const features = (form.key_features || "")
-    .split(",")
-    .filter((f: string) => f.trim() !== "");
+  const features = Array.isArray(form.key_features)
+    ? form.key_features
+    : typeof form.key_features === "string"
+    ? form.key_features.split(/(?:\.|\n)+/).filter((f: string) => f.trim() !== "")
+    : [];
 
   const galleryImages =
     project.image_urls && Array.isArray(project.image_urls)
       ? project.image_urls
       : project.image_url
-        ? [project.image_url]
-        : [];
+      ? [project.image_url]
+      : [];
 
   const nextImage = () => {
     if (currentImage < galleryImages.length - 1) {
@@ -260,7 +301,6 @@ export default function ProjectDetailPage() {
 
               <div>
                 <p className="text-lg font-semibold">{tech.length}</p>
-
                 <p className="text-[11px] text-white/40">Total Technology</p>
               </div>
             </motion.div>
@@ -275,7 +315,6 @@ export default function ProjectDetailPage() {
 
               <div>
                 <p className="text-lg font-semibold">{features.length}</p>
-
                 <p className="text-[11px] text-white/40">Main Features</p>
               </div>
             </motion.div>
@@ -349,7 +388,11 @@ export default function ProjectDetailPage() {
 
             {editMode ? (
               <input
-                value={form.technologies}
+                value={
+                  Array.isArray(form.technologies)
+                    ? form.technologies.join(", ")
+                    : form.technologies || ""
+                }
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -453,7 +496,11 @@ export default function ProjectDetailPage() {
 
             {editMode ? (
               <textarea
-                value={form.key_features}
+                value={
+                  Array.isArray(form.key_features)
+                    ? form.key_features.join(". ")
+                    : form.key_features || ""
+                }
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -467,7 +514,6 @@ export default function ProjectDetailPage() {
                 {features.map((f: string, i: number) => (
                   <li key={i} className="flex gap-3">
                     <span className="text-white/35 mt-[2px]">•</span>
-
                     <span>{f.trim()}</span>
                   </li>
                 ))}

@@ -23,9 +23,11 @@ extend({ MeshLineGeometry, MeshLineMaterial });
 
 const GLTF_PATH = '/assets/kartu.glb';
 const TEXTURE_PATH = '/assets/bandd.png';
+const PHOTO_PATH = '/foto-rafif.png'; // <-- Tambahkan ini
 
 useGLTF.preload(GLTF_PATH);
 useTexture.preload(TEXTURE_PATH);
+useTexture.preload(PHOTO_PATH); // <-- Tambahkan ini juga
 
 export default function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -133,8 +135,14 @@ function Band({ isMobile, maxSpeed = 50, minSpeed = 10 }) {
     linearDamping: 4,
   };
 
+  // const { nodes, materials } = useGLTF(GLTF_PATH);
+  // const texture = useTexture(TEXTURE_PATH);
+  // const { width, height } = useThree((state) => state.size);
+
   const { nodes, materials } = useGLTF(GLTF_PATH);
   const texture = useTexture(TEXTURE_PATH);
+  const photoTexture = useTexture(PHOTO_PATH); // <-- Panggil fotomu
+  photoTexture.flipY = false; // <-- Penting: agar foto tidak terbalik di model 3D
   const { width, height } = useThree((state) => state.size);
 
   const [curve] = useState(
@@ -260,7 +268,7 @@ function Band({ isMobile, maxSpeed = 50, minSpeed = 10 }) {
             }}
           >
             <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial {...materials.base} />
+              <meshPhysicalMaterial {...materials.base} map={photoTexture} />
             </mesh>
             <mesh geometry={nodes.clip.geometry} material={materials.metal} />
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
