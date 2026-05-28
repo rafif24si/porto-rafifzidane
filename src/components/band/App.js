@@ -1,7 +1,7 @@
 'use client';
 import './index.css';
 import * as THREE from 'three';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
 import {
   useGLTF,
@@ -23,11 +23,11 @@ extend({ MeshLineGeometry, MeshLineMaterial });
 
 const GLTF_PATH = '/assets/kartu.glb';
 const TEXTURE_PATH = '/assets/bandd.png';
-const PHOTO_PATH = '/foto-rafif.png'; // <-- Tambahkan ini
+const PHOTO_PATH = '/foto-rafif5.jpeg'; 
 
 useGLTF.preload(GLTF_PATH);
 useTexture.preload(TEXTURE_PATH);
-useTexture.preload(PHOTO_PATH); // <-- Tambahkan ini juga
+useTexture.preload(PHOTO_PATH); 
 
 export default function App() {
   const [isMobile, setIsMobile] = useState(false);
@@ -52,16 +52,16 @@ export default function App() {
       }}
     >
       <Canvas
-        gl={{ alpha: true }}
+        gl={{ alpha: true, antialias: true }}
         camera={{ position: [0, 0, 13], fov: 25 }}
         style={{
           background: 'transparent',
           width: '100%',
           height: '100%',
-          pointerEvents: isMobile ? 'none' : 'auto', // ✅ fix drag desktop
+          pointerEvents: isMobile ? 'none' : 'auto', 
         }}
       >
-        <ambientLight intensity={Math.PI} />
+        <ambientLight intensity={Math.PI / 2} />
 
         <Scene isMobile={isMobile} />
 
@@ -108,7 +108,6 @@ function Scene({ isMobile }) {
       gravity={[0, -40, 0]}
       timeStep={1 / 60}
     >
-      {/* hanya desktop */}
       {!isMobile && <Band isMobile={isMobile} />}
     </Physics>
   );
@@ -135,14 +134,17 @@ function Band({ isMobile, maxSpeed = 50, minSpeed = 10 }) {
     linearDamping: 4,
   };
 
-  // const { nodes, materials } = useGLTF(GLTF_PATH);
-  // const texture = useTexture(TEXTURE_PATH);
-  // const { width, height } = useThree((state) => state.size);
-
   const { nodes, materials } = useGLTF(GLTF_PATH);
   const texture = useTexture(TEXTURE_PATH);
-  const photoTexture = useTexture(PHOTO_PATH); // <-- Panggil fotomu
-  photoTexture.flipY = false; // <-- Penting: agar foto tidak terbalik di model 3D
+  const photoTexture = useTexture(PHOTO_PATH); 
+  
+  photoTexture.flipY = true; 
+  photoTexture.wrapS = photoTexture.wrapT = THREE.ClampToEdgeWrapping;
+  // Memastikan tekstur dirender dengan kualitas tinggi (Max Sharpness)
+  photoTexture.minFilter = THREE.LinearMipMapLinearFilter;
+  photoTexture.magFilter = THREE.LinearFilter;
+  photoTexture.anisotropy = 16; // Menambah ketajaman sudut pandang miring
+  
   const { width, height } = useThree((state) => state.size);
 
   const [curve] = useState(
@@ -231,6 +233,22 @@ function Band({ isMobile, maxSpeed = 50, minSpeed = 10 }) {
   curve.curveType = 'chordal';
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
+  // Membuat Material Frame Putih
+  const frameMaterial = useMemo(() => new THREE.MeshPhysicalMaterial({
+    color: "#f8f9fa",
+    metalness: 0.1,
+    roughness: 0.5,
+    clearcoat: 1,
+    clearcoatRoughness: 0.15,
+  }), []);
+
+  // 🔥 PERBAIKAN MATERIAL FOTO: Menggunakan BasicMaterial agar 100% cerah, jernih, dan mengabaikan interaksi lampu 3D 🔥
+  const photoMaterial = useMemo(() => new THREE.MeshBasicMaterial({
+    map: photoTexture,
+    side: THREE.FrontSide, // Hanya muncul di depan
+    transparent: true, // Antisipasi jika ada data alpha
+  }), [photoTexture]);
+
   return (
     <>
       <group position={[3, 4, 0]}>
@@ -267,9 +285,18 @@ function Band({ isMobile, maxSpeed = 50, minSpeed = 10 }) {
               );
             }}
           >
-            <mesh geometry={nodes.card.geometry}>
-              <meshPhysicalMaterial {...materials.base} map={photoTexture} />
+            {/* KARTU FRAME (HANYA WARNA PUTIH POLOS) */}
+            <mesh geometry={nodes.card.geometry} material={frameMaterial} />
+
+            {/* 🔥 KANVAS FOTO SEKARANG ADA DI PUSAT (0,0) KARTU FISIKA 🔥 */}
+            {/* position=[X(Kiri/Kanan), Y(Atas/Bawah), Z(Jarak Kedepan)] */}
+            {/* Y diubah menjadi 0.55 agar naik ke tengah kartu, Z ditebalkan sedikit ke 0.02 */}
+            <mesh position={[0, 0.55, 0.02]}>
+              {/* Geometryargs: [Lebar, Tinggi] -> Mengatur ukuran foto dan border putih sesuai referensi */}
+              <planeGeometry args={[0.62, 0.82]} />
+              <primitive object={photoMaterial} attach="material" />
             </mesh>
+
             <mesh geometry={nodes.clip.geometry} material={materials.metal} />
             <mesh geometry={nodes.clamp.geometry} material={materials.metal} />
           </group>

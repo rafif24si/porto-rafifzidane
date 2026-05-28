@@ -331,7 +331,7 @@ export default function About() {
                 }}
               >
                 <img
-                  src="/foto-rafif.png"
+                  src="/foto-rafif4.png"
                   alt="Profile Rafif"
                   style={{
                     width: 240,
