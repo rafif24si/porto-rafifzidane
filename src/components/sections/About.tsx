@@ -197,7 +197,7 @@ export default function About() {
                 maxWidth: isMobile ? "100%" : "490px",
               }}
             >
-              Mahasiswa Sistem Informasi di Politeknik Caltex Riau (PCR) dengan ketertarikan mendalam di bidang Frontend Development dan UI/UX Design. Berfokus pada pengembangan website yang fungsional dan responsif menggunakan teknologi modern seperti React.js dan Laravel, serta merancang antarmuka digital yang estetis, clean, dan user-friendly.
+              Mahasiswa Sistem Informasi di Politeknik Caltex Riau (PCR) dengan ketertarikan mendalam di bidang Frontend Development . Berfokus pada pengembangan website yang fungsional dan responsif menggunakan teknologi modern seperti React.js dan Laravel, serta merancang antarmuka digital yang estetis, clean, dan user-friendly.
             </motion.p>
 
             {/* QUOTE */}
@@ -240,7 +240,7 @@ export default function About() {
             >
               {/* DOWNLOAD CV */}
               <a
-                href="/cv-rafif-zidane1.pdf"
+                href="/cv-rafif-zidane2.pdf"
                 download="CV_M_Rafif_Zidane.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
