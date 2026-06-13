@@ -29,7 +29,7 @@ const socialLinks = [
   },
   { 
     name: 'GitHub', 
-    url: 'https://github.com/mrafif24si-lab', 
+    url: 'https://github.com/rafif24si', 
     icon: FaGithub, 
     color: '#ffffff' 
   },
