@@ -240,7 +240,7 @@ export default function About() {
             >
               {/* DOWNLOAD CV */}
               <a
-                href="/cv-rafif-zidane2.pdf"
+                href="/CV-M.Rafif Zidane Now.pdf"
                 download="CV_M_Rafif_Zidane.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
