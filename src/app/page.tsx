@@ -12,6 +12,7 @@ import About from '@/components/sections/About'
 import PortfolioShowcase from '@/components/sections/PortfolioShowcase'
 import ContactSection from '@/components/sections/contact/ContactSection'
 import WelcomeScreen from '@/components/WelcomeScreen'
+import ScrollToTop from '@/components/ui/ScrollToTop'
 
 import { hasPlayedIntro, setIntroPlayed } from '@/lib/introState'
 
@@ -82,6 +83,7 @@ useEffect(() => {
         <Experience />
       <Gallery />
         <ContactSection />
+        <ScrollToTop />
       </div>
 
       <AnimatePresence>
